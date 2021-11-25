@@ -1,0 +1,29 @@
+FROM fedora:35
+
+RUN dnf update -y \
+    && \
+    dnf groupinstall -y \
+        "Development Tools" \
+        "Development Libraries" \
+    && dnf clean all \
+  	&& rm -rf /var/cache/dnf
+
+RUN dnf update -y \
+    && \
+    dnf install -y \
+        ncurses-devel \
+        SDL2-devel \
+        SDL2_image-devel \
+        SDL2_ttf-devel \
+        SDL2_mixer-devel \
+        python3-docutils \
+    && dnf clean all \
+  	&& rm -rf /var/cache/dnf
+    
+ADD build.sh /opt/build.sh
+ADD patch /opt/patch
+
+WORKDIR /opt
+CMD ./build.sh
+
+
