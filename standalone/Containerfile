@@ -21,7 +21,6 @@ RUN dnf update -y \
   	&& rm -rf /var/cache/dnf
     
 ADD build.sh /opt/build.sh
-ADD patch /opt/patch
 
 WORKDIR /opt
 CMD ./build.sh
