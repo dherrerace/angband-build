@@ -20,6 +20,8 @@ done
     --enable-curses \
     --enable-x11 \
     --enable-sdl2 \
-    --enable-sdl2-mixer
+    --enable-sdl2-mixer \
+    --enable-tests
 
 make
+make tests

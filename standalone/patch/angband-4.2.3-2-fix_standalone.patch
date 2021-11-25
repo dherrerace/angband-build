@@ -69,3 +69,16 @@ index 0669c5988..dc58e312b 100644
  
  #undef BUILD_DIRECTORY_PATH
  }
+diff --git a/src/tests/Makefile b/src/tests/Makefile
+index ed42b69c5..73a89c7c4 100644
+--- a/src/tests/Makefile
++++ b/src/tests/Makefile
+@@ -18,7 +18,7 @@ TESTOBJS += test-utils.o unit-test.o
+ build : $(TESTPROGS)
+ 
+ run : build
+-	@./run-tests
++	@(cd ../.. ; ./src/tests/run-tests)
+ 
+ %.o : %.c
+ 	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $^
