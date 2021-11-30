@@ -13,7 +13,7 @@ index 0437cc7cb..8b294a5f2 100644
  
  It is considered good practice to retain this statement for derivatives, rather than (e.g.) redistributing Adam Bolt's tiles under the GPL, or choosing to make a variant which is only under one of the Angband or GPL licences.  This allows easier sharing of changes between variants.
 diff --git a/lib/fonts/Makefile b/lib/fonts/Makefile
-index c5f3b99c0..fa54b979f 100644
+index c5f3b99c0..eccba6ebc 100644
 --- a/lib/fonts/Makefile
 +++ b/lib/fonts/Makefile
 @@ -4,5 +4,5 @@ include $(MKPATH)buildsys.mk
@@ -21,7 +21,7 @@ index c5f3b99c0..fa54b979f 100644
  	7x13xb.fon 8x8x.fon 8x8xb.fon 8x12x.fon 8x12xb.fon 8x13x.fon 8x16x.fon \
  	9x15x.fon 9x15xb.fon 10x14x.fon 10x14xb.fon 10x20x.fon 12x18x.fon \
 -	12x24x.fon 16x16x.fon 16x24x.fon
-+	12x24x.fon 16x16x.fon 16x24x.fon FreeMonoBold.ttf
++	12x24x.fon 16x16x.fon 16x24x.fon RobotoMono-Bold.ttf
  PACKAGE = fonts
 diff --git a/lib/fonts/RobotoMono-Bold.ttf b/lib/fonts/RobotoMono-Bold.ttf
 new file mode 100644
