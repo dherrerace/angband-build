@@ -1,0 +1,144 @@
+diff --git a/configure.ac b/configure.ac
+index 970a2141b..895169899 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -26,11 +26,17 @@ AC_ARG_WITH(private_dirs,
+ 	[AS_HELP_STRING([--with-private-dirs], [use private scorefiles/savefiles])])
+ AC_ARG_WITH(no_install,
+ 	[AS_HELP_STRING([--with-no-install], [don't install, just run in-place])])
++AC_ARG_WITH(standalone,
++	[AS_HELP_STRING([--with-standalone], [with-no-install, but movable and save files in lib path])])
+ 
+ if test "x$with_setgid" = "xyes"; then
+ 	AC_MSG_ERROR([Please specify a group to install as.])
+ fi
+ 
++if test "x$with_standalone" = "xyes"; then
++	with_no_install="yes"
++fi
++
+ if test "x$wsetgid" = "x" && test "x$with_no_install" = "x"; then
+ 	with_private_dirs="yes"
+ fi
+@@ -57,6 +63,10 @@ if test "x$wsetgid$with_private_dirs$with_no_install" != "xyes";  then
+     This leaves the game to run from the directory into which it was extracted
+     and compiled, touching nothing else on the system - make install is not
+     run.
++
++--standalone
++    Same as --with-no-install, but let's you move the instalation folder and 
++	sets user, score and config files inside the lib folder.
+ "
+ 	AC_MSG_ERROR([Please specify an installation method.])
+ fi
+@@ -145,6 +155,10 @@ if test "x$with_private_dirs" != "x"; then
+ 	AC_DEFINE(USE_PRIVATE_PATHS, 1, [Define to use private save and score paths.])
+ fi
+ 
++if test "x$with_standalone" != "x"; then
++	AC_DEFINE(STANDALONE, 1, [User paths belong to lib.])
++fi
++
+ # Only change bindir if it's the configure-supplied default, which handily doesn't expand exec_prefix
+ if test "x$bindir" = "x\${exec_prefix}/bin"; then
+   bindir=${exec_prefix}/games
+@@ -152,6 +166,9 @@ fi
+ 
+ if test "x$with_no_install" != "x"; then
+ 	configpath="${PWD}/lib/"
++	if test "x$with_standalone" != "x"; then
++		configpath="./lib/"
++	fi
+ else
+ 	configpath="${sysconfdir}/${PACKAGE}/"
+ fi
+@@ -165,6 +182,9 @@ esac
+ if test "x$with_no_install" != "x"; then
+ 	libpath="${PWD}/lib/"
+ 	bindir=".."
++	if test "x$with_standalone" != "x"; then
++		libpath="./lib/"
++	fi
+ else
+ 	libpath="${datarootdir}/${PACKAGE}/"
+ fi
+@@ -176,6 +196,9 @@ esac
+ 
+ if test "x$with_no_install" != "x"; then
+ 	docdir="${PWD}/doc/"
++	if test "x$with_standalone" != "x"; then
++		docdir="./doc/"
++	fi
+ else
+ 	# Only change docdir if it's the configure-supplied default, which handily doesn't expand prefix
+ 	if test "x$docdir" = "x\${datarootdir}/doc/\${PACKAGE_TARNAME}"; then
+@@ -190,6 +213,9 @@ esac
+ 
+ if test "x$with_no_install" != "x"; then
+ 	varpath="${PWD}/lib/"
++	if test "x$with_standalone" != "x"; then
++		varpath="./lib/"
++	fi
+ else
+ 	varpath="${localstatedir}/games/${PACKAGE}/"
+ fi
+diff --git a/src/init.c b/src/init.c
+index 0669c5988..0b9ee8ee7 100644
+--- a/src/init.c
++++ b/src/init.c
+@@ -376,6 +376,10 @@ void init_file_paths(const char *configpath, const char *libpath, const char *da
+ 
+ #endif /* PRIVATE_USER_PATH */
+ 
++#ifdef STANDALONE
++	BUILD_DIRECTORY_PATH(ANGBAND_DIR_USER, libpath, "user");
++#endif /* STANDALONE */
++
+ 	/* Build the path to the user info directory */
+ 	BUILD_DIRECTORY_PATH(ANGBAND_DIR_INFO, ANGBAND_DIR_USER, "info");
+ 
+@@ -384,6 +388,9 @@ void init_file_paths(const char *configpath, const char *libpath, const char *da
+ #else /* !USE_PRIVATE_PATHS */
+ 	userpath = (char *)datapath;
+ #endif /* USE_PRIVATE_PATHS */
++#ifdef STANDALONE
++	userpath = ANGBAND_DIR_USER;
++#endif /* STANDALONE */
+ 
+ 	/* Build the path to the score, save and archive directories */
+ 	BUILD_DIRECTORY_PATH(ANGBAND_DIR_SCORES, userpath, "scores");
+diff --git a/src/main.c b/src/main.c
+index 66e11d8b5..8b78a6270 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -130,6 +130,17 @@ static void init_stuff(void)
+ 	char libpath[512];
+ 	char datapath[512];
+ 
++#ifdef STANDALONE
++	char path[512];
++
++	/* Build the filename */
++	path_build(path, sizeof(path), DEFAULT_LIB_PATH, "readme.txt");
++
++	/* Hack -- Validate the "readme.txt" file */
++	if (!file_exists(path))
++		quit_fmt("Cannot find lib folder:\n%s", DEFAULT_LIB_PATH);
++#endif
++
+ 	/* Use the angband_path, or a default */
+ 	my_strcpy(configpath, DEFAULT_CONFIG_PATH, sizeof(configpath));
+ 	my_strcpy(libpath, DEFAULT_LIB_PATH, sizeof(libpath));
+diff --git a/src/tests/Makefile b/src/tests/Makefile
+index ed42b69c5..73a89c7c4 100644
+--- a/src/tests/Makefile
++++ b/src/tests/Makefile
+@@ -18,7 +18,7 @@ TESTOBJS += test-utils.o unit-test.o
+ build : $(TESTPROGS)
+ 
+ run : build
+-	@./run-tests
++	@(cd ../.. ; ./src/tests/run-tests)
+ 
+ %.o : %.c
+ 	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $^

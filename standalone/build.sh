@@ -16,7 +16,7 @@ done
 ./autogen.sh
 
 ./configure \
-    --with-no-install \
+    --with-standalone \
     --enable-curses \
     --enable-x11 \
     --enable-sdl2 \

@@ -8,12 +8,11 @@ URL:     https://rephial.org/
 Source0: angband-4.2.3-patched.tar.gz
 Source1: angband.desktop
 Source2: angband.png
-Patch0:  angband-4.2.3-0-freetype_bug.patch
+Patch0:  angband-4.2.3-0-fix_events
 Patch1:  angband-4.2.3-1-ncursesw6.patch
-Patch2:  angband-4.2.3-2-fix_standalone.patch
-Patch3:  angband-4.2.3-3-test_fix.patch
+Patch2:  angband-4.2.3-2-test_fix.patch
 
-BuildRequires: autoconf automake
+BuildRequires: autoconf automake git
 BuildRequires: ncurses-devel desktop-file-utils gcc python3-docutils
 BuildRequires: SDL2-devel SDL2_image-devel SDL2_ttf-devel SDL2_mixer-devel
 
